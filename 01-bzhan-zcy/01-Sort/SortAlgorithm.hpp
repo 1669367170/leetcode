@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <limits.h>
 
 // 选择排序 (一次遍历后，将最小的元素放到最前)
 void SelectionSort(std::vector<int> &a) {
@@ -111,4 +112,116 @@ void QuickSort(std::vector<int> &a, int left, int right) {
         return;
     }
     Partion(a, left, right);
+}
+
+void HeapInsert(std::vector<int> &arr, int index) {
+    // 比父节点值大或到了0索引节点
+    // (0 - 1) / 2 = 0
+    while (arr[index] > arr[(index - 1) / 2]) {
+        std::swap(arr[index], arr[(index - 1) / 2]);
+        index = (index - 1) / 2;
+    }
+}
+
+void HeapIfy(std::vector<int> &arr, int index, int heapSize) {
+    int left = 2 * index + 1;
+    while (left < heapSize) {
+        // 两个孩子中，谁的值大，把下标给largest
+        int largest = left + 1 < heapSize && arr[left + 1] > arr[left] ? left + 1 : left;
+        // 父和孩子之间，谁的值大，把下标给largest
+        largest = arr[largest] > arr[index] ? largest : index;
+        // 父节点是最大值
+        if (largest == index) {
+            break;
+        }
+        std::swap(arr[largest], arr[index]);
+        index = largest;
+        left = 2 * index + 1;
+    }
+}
+
+// 堆排序（一次HeapIfy找到当前最大值，放到最后）
+void HeapSort(std::vector<int> &arr) {
+    if (arr.size() < 2) {
+        return;
+    }
+    // 先HeapInsert构建大根堆
+    for (int i = 0; i < arr.size(); ++i) { // O(N)
+        HeapInsert(arr, i); // O(logN)
+    }
+
+    // 用HeapIfy构建大根堆，从最后一个元素开始，时间复杂度更小O(N)
+//    for (int i = arr.size() - 1; i >= 0; ++i) {
+//        HeapIfy(arr, i, arr.size());
+//    }
+
+    int heapSize = arr.size();
+    std::swap(arr[0], arr[--heapSize]);
+    while (heapSize > 0) { // O(N)
+        HeapIfy(arr, 0, heapSize); // O(logN)
+        // 将最大值放到最后
+        std::swap(arr[0], arr[heapSize - 1]); // O(1)
+        --heapSize;
+    }
+}
+
+// 获取最大的位数
+int GetMaxBits(const std::vector<int> &arr) {
+    int max = INT_MIN;
+    for (int i = 0; i < arr.size(); ++i) {
+        max = std::max(max, arr[i]);
+    }
+    int maxBit = 0;
+    while (max) {
+        max = max / 10;
+        ++maxBit;
+    }
+    return maxBit;
+}
+
+// 获取第d位十进制的数
+int GetDigit(int x, int d) {
+    int res = 0;
+    while (x > 0 && d > 0) {
+        res = x % 10;
+        x = x / 10;
+        --d;
+    }
+    return res;
+}
+
+// 基数排序
+void RadixSort(std::vector<int> &arr) {
+    if (arr.size() < 2) {
+        return;
+    }
+    int radix = 10;
+    int L = 0, R = arr.size() - 1;
+    // 有多少个数准备多少个辅助空间
+    std::vector<int> bucket(R - L + 1);
+    int digit = GetMaxBits(arr);
+    // 有多少位就进出桶多少次
+    for (int d = 1; d <= digit; ++d) {
+        // 10个空间，count[i]代表当前位(d位)是[0-i]的数有多少个
+        std::vector<int> count(10);
+        // 1. 生成count数组
+        for (int i = L; i <= R; ++i) {
+            int num = GetDigit(arr[i], d);
+            count[num]++;
+        }
+        // 2. 将count处理成前缀和（重要！）count[i]代表<=i的数的频次
+        for (int i = 1; i < radix; ++i) {
+            count[i] += count[i - 1];
+        }
+        // 3. 从右往左遍历arr，基于count前缀和数组进桶，刷新count
+        for (int i = R; i >= L; --i) {
+            int num = GetDigit(arr[i], d);
+            bucket[count[num] - 1] = arr[i];
+            --count[num];
+        }
+        // 4. 出桶
+        for (int i = L, j = 0; i <= R; ++i, ++j) {
+            arr[i] = bucket[j];
+        }
+    }
 }

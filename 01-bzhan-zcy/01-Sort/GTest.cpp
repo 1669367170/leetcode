@@ -4,6 +4,7 @@
 class TestArray {
 public:
     TestArray() = default;
+
     ~TestArray() = default;
 
     std::vector<int> truth;
@@ -44,5 +45,15 @@ TEST_F(SortTest, Merge) {
 
 TEST_F(SortTest, Quick) {
     QuickSort(testArray.input, 0, testArray.input.size() - 1);
+    EXPECT_EQ(testArray.input, testArray.truth);
+}
+
+TEST_F(SortTest, Heap) {
+    HeapSort(testArray.input);
+    EXPECT_EQ(testArray.input, testArray.truth);
+}
+
+TEST_F(SortTest, Radix) {
+    RadixSort(testArray.input);
     EXPECT_EQ(testArray.input, testArray.truth);
 }
