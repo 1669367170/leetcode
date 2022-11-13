@@ -9,9 +9,10 @@ set(GOOGLE_TEST_LIB ../thirdparty/googletest-main/install/lib)
 
 link_directories(${GOOGLE_TEST_LIB})
 add_subdirectory(01-Sort)
+add_subdirectory(03-Tree)
 
 # 添加一个可执行程序
-add_executable(${PROJECT_NAME} 01-Sort/GTest.cpp)
+add_executable(${PROJECT_NAME} 01-Sort/GTest.cpp 03-Tree/GTest.cpp)
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC
