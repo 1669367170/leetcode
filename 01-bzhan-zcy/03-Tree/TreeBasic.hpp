@@ -79,3 +79,20 @@ bool isFBT(TreeNode *head) {
     Info info = isFBTProcess(head);
     return info.nodes == (1 << info.height) - 1;
 }
+
+// 获取两个节点的最小公共祖先
+TreeNode *GetLowestAncestor(TreeNode *head, TreeNode *node1, TreeNode *node2) {
+    // base case
+    if (head == nullptr || head == node1 || head == node2) {
+        return head;
+    }
+    // 找左孩子和右孩子要答案
+    TreeNode *left = GetLowestAncestor(head->left, node1, node2);
+    TreeNode *right = GetLowestAncestor(head->right, node1, node2);
+    // 如果一个子树既没有node1也没有node2一定会返回空
+    // 如果一个子树左和右都有返回值，就是最小公共祖先
+    if (left == nullptr && right == nullptr) {
+        return head;
+    }
+    return left != nullptr ? left : right;
+}

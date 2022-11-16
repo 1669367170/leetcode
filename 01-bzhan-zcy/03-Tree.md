@@ -252,6 +252,37 @@ void WFS(TreeNode *treeNode) {
 }
 ```
 
+#### 3）题3-给定两个二叉树的节点node1和node2，找到它们的最低公共祖先节点
+
+> - 解法一：先递归方式建立HashMap（存每个节点的父节点），再去查找。
+>
+> - 解法二：递归。
+>
+>   - 1）情况1 node1是node2的最低公共祖先，或者node2是node1的最低公共祖先。
+>
+>   - 2）情况2 情况1之外的所有情况。需要向上才能找到。
+
+```C++
+// 获取两个节点的最小公共祖先
+TreeNode *GetLowestAncestor(TreeNode *head, TreeNode *node1, TreeNode *node2) {
+    // base case
+    if (head == nullptr || head == node1 || head == node2) {
+        return head;
+    }
+    // 找左孩子和右孩子要答案
+    TreeNode *left = GetLowestAncestor(head->left, node1, node2);
+    TreeNode *right = GetLowestAncestor(head->right, node1, node2);
+    // 如果一个子树既没有node1也没有node2一定会返回空
+    // 如果一个子树左和右都有返回值，就是最小公共祖先
+    if (left == nullptr && right == nullptr) {
+        return head;
+    }
+    return left != nullptr ? left : right;
+}
+```
+
+
+
 ### 3、二叉树的相关概念及其实现判断
 
 ### 二叉树解题套路：（树型DP）
