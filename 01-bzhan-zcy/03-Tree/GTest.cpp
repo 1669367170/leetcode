@@ -1,16 +1,17 @@
 #include "TreeTraversal.hpp"
+#include "TreeBasic.hpp"
 #include <gtest/gtest.h>
 
-class TreeGTest {
+class TreeTestData {
 public:
-    TreeGTest() = default;
+    TreeTestData() = default;
 
-    ~TreeGTest() = default;
+    ~TreeTestData() = default;
 
     TreeNode *head;
 };
 
-class TreeTravelSalTest : public ::testing::Test {
+class TreeGTesT : public ::testing::Test {
 protected:
     void SetUp() override {
         const int TREENODE_NUM = 7;
@@ -39,33 +40,39 @@ protected:
             }
         }
         // 或者通过treeNode->left->left..来构建
-        treeGTest.head = treeNodes[0];
+        treeTestData.head = treeNodes[0];
     }
 
     // void TearDown() override {}
-    TreeGTest treeGTest;
+    TreeTestData treeTestData;
 };
 
-TEST_F(TreeTravelSalTest, BASIC) {
+TEST_F(TreeGTesT, TravelSal) {
     std::cout << "PreOrderRecur: ";
-    PreOrderRecur(treeGTest.head);
+    PreOrderRecur(treeTestData.head);
     std::cout << "\nPreOrderUnRecur: ";
-    PreOrderUnRecur(treeGTest.head);
+    PreOrderUnRecur(treeTestData.head);
     std::cout << std::endl;
 
     std::cout << "InOrderRecur: ";
-    InOrderRecur(treeGTest.head);
+    InOrderRecur(treeTestData.head);
     std::cout << "\nInOrderUnRecur: ";
-    InOrderUnRecur(treeGTest.head);
+    InOrderUnRecur(treeTestData.head);
     std::cout << std::endl;
 
     std::cout << "PosOrderRecur: ";
-    PosOrderRecur(treeGTest.head);
+    PosOrderRecur(treeTestData.head);
     std::cout << "\nPosOrderUnRecur: ";
-    PosOrderUnRecur(treeGTest.head);
+    PosOrderUnRecur(treeTestData.head);
     std::cout << std::endl;
 
     std::cout << "Width First Search: ";
-    WFS(treeGTest.head);
+    WFS(treeTestData.head);
     std::cout << std::endl;
+}
+
+TEST_F(TreeGTesT, Basic) {
+    EXPECT_FALSE(isBST(treeTestData.head));
+    EXPECT_TRUE(isCBT(treeTestData.head));
+    EXPECT_TRUE(isFBT(treeTestData.head));
 }

@@ -2,6 +2,17 @@
 
 ## P7 二叉树
 
+### 概念小结：
+
+- 1）先序遍历：根左右；中序遍历：左根右；后序遍历：左右根。
+
+- 2）搜索二叉树：每棵子树的左子树（所有节点）都比根节点小，右子树（所有节点）都比根节点大。
+
+- 3）完全二叉树：满二叉树 or 只有最后一层没满且没满的是右子树（左侧是满的）。
+
+- 4）满二叉树：最大深度L，节点数N，N = 2 ^ L - 1。
+- 5）平衡二叉树：对于任何一个子树，左树的高度和右树的高度差不超过1。
+
 ### 1、二叉树的遍历
 
 二叉树节点结构
@@ -240,4 +251,127 @@ void WFS(TreeNode *treeNode) {
     }
 }
 ```
+
+### 3、二叉树的相关概念及其实现判断
+
+### 二叉树解题套路：（树型DP）
+
+- 1）开始条件，不满足直接返回；
+
+- 2）左右信息递归；（定义好信息结构体，希望左子树返回什么信息，右子树返回什么信息）
+
+- 3）最终返回值。（**如何利用左、右子树返回的信息加工组合**，得到最终的返回结果）
+
+#### 1）如何判断一棵二叉树是否是搜索二叉树（BST）
+
+- 搜索二叉树：每棵子树的左子树（所有节点）都比根节点小，右子树（所有节点）都比根节点大。
+- 解法：中序遍历（左根右），（处理时判断一下当前处理值是否比上一个处理值大）如果结果都是升序的，就是搜索二叉树。
+
+```C++
+int preVal = INT_MIN; // 全局变量
+
+// 判断是否搜索二叉树
+bool isBST(TreeNode *head) {
+    if (head == nullptr) {
+        return true;
+    }
+    bool isLeftBST = isBST(head->left);
+    if (!isLeftBST) {
+        return false;
+    }
+    if (head->val <= preVal) { // 搜索二叉树没有重复大小值的节点
+        return false;
+    } else {
+        preVal = head->val;
+    }
+    return isBST(head->right);
+}
+```
+
+#### 2）如何判断一棵二叉树是完全二叉树
+
+- 完全二叉树：满二叉树 or 只有最后一层没满且没满的是右子树（左侧是满的）。
+- 解法：宽度优先遍历（层序遍历）。
+  - a）遍历过程中，任何一个节点有右孩子但是没有左孩子，就返回false。
+  - b）在a条件满足的情况下，如果遇到了第一个左右孩子不全的节点，那么后续节点都是叶子节点。
+
+```C++
+bool isCBT(TreeNode *head) {
+    if (head == nullptr) {
+        return true;
+    }
+    // 是否遇到过左右两个孩子不双全的节点
+    bool isLeaf = false;
+    std::queue<TreeNode *> q;
+    q.push(head);
+    while (!q.empty()) {
+        head = q.front();
+        q.pop();
+        TreeNode *left = head->left;
+        TreeNode *right = head->right;
+        // 有右孩子没有左孩子
+        if (left == nullptr && right != nullptr) {
+            return false;
+        }
+        // 遇到了第一个左右孩子不全的节点，后续节点不是叶子节点。
+        if (isLeaf && (left != nullptr || right != nullptr)) {
+            return false;
+        }
+        if (left) {
+            q.push(left);
+        }
+        if (right) {
+            q.push(right);
+        }
+        // 第一个左右孩子不双全的节点
+        if (left == nullptr || right == nullptr) {
+            isLeaf = true;
+        }
+    }
+    return true;
+}
+```
+
+#### 3）如何判断一棵二叉树是否是满二叉树
+
+- 满二叉树：最大深度L，节点数N，N = 2 ^ L - 1。
+
+```C++
+class Info {
+public:
+    Info(int h, int n) : height(h), nodes(n) {}
+
+    int height{0};
+    int nodes{0};
+};
+
+Info isFBTProcess(TreeNode *head) {
+    if (head == nullptr) {
+        return Info(0, 0);
+    }
+    Info leftData = isFBTProcess(head->left);
+    Info rightData = isFBTProcess(head->right);
+    int height = std::max(leftData.height, rightData.height) + 1;
+    int nodes = leftData.nodes + rightData.nodes + 1;
+    return Info(height, nodes);
+}
+
+// 是否满二叉树
+bool isFBT(TreeNode *head) {
+    Info info = isFBTProcess(head);
+    return info.nodes == (1 << info.height) - 1;
+}
+```
+
+#### 4）如何判断一棵二叉树是否是平衡二叉树
+
+- 平衡二叉树： 对于任何一个子树，左树的高度和右树的高度差不超过1。
+
+- 解法：
+
+  1）左子树是平衡二叉树；
+
+  2）右子树是平衡二叉树；
+
+  3）当前根节点的左树高度和右树高度差不超过1。
 
