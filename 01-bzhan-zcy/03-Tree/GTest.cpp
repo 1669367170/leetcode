@@ -75,4 +75,8 @@ TEST_F(TreeGTesT, Basic) {
     EXPECT_FALSE(isBST(treeTestData.head));
     EXPECT_TRUE(isCBT(treeTestData.head));
     EXPECT_TRUE(isFBT(treeTestData.head));
+
+    std::string serailByPreStr = SerialByPre(treeTestData.head);
+    std::cout << "SerialByPre: " << serailByPreStr << std::endl;
+    EXPECT_EQ(DeSerialByPre(serailByPreStr)->val, treeTestData.head->val);
 }

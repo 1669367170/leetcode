@@ -281,7 +281,139 @@ TreeNode *GetLowestAncestor(TreeNode *head, TreeNode *node1, TreeNode *node2) {
 }
 ```
 
+#### 4）题4-在二叉树中找到一个节点的后继节点
 
+- 在二叉树的中序遍历的序列中，node的下一个节点叫做node的后继节点。前一个节点叫做node的前驱节点。
+
+  例：下面二叉树的中序遍历结果：D，B，E，A，F，C，G
+
+  B的后继节点是E，前驱节点是D
+
+- 要求时间复杂度<O(N)，O(K)，node节点距离后继节点的距离为k。
+
+```mermaid
+graph TD
+A --> B & C
+B --> D & E
+C --> F & G
+```
+
+> 解法：
+>
+> 1）情况一：节点node有右孩子，node右孩子的最左孩子节点就是后继节点。（一直遍历左树，A -> C -> D -> F -> H）
+>
+> ,例：节点A的后继节点是H。
+>
+> ```mermaid
+> graph TD
+> A --> B & C
+> C --> D & E
+> D --> F & G
+> F --> H & I
+> ```
+>
+> 
+>
+> 2）情况二：节点node无右孩子，一直用father指针往上找父节点nodeA，直到nodeA是nodeA的父节点的左孩子。则nodeA的父节点是node的后继节点。 G -> E -> B -> A
+>
+> 例：节点G的后继节点是A。
+>
+> ```mermaid
+> graph TD
+> A --> B & C
+> B --> D & E
+> E --> F & G
+> ```
+
+```C++
+TreeNode *GetLeftMost(TreeNode *head) {
+    if (head == nullptr) {
+        return nullptr;
+    }
+    while (head->left) {
+        head = head->left;
+    }
+    return head;
+}
+
+// 获取二叉树节点的后继节点
+TreeNode *GetSuccessorNode(TreeNode *head) {
+    if (head == nullptr) {
+        return nullptr;
+    }
+    if (head->right != nullptr) {
+        return GetLeftMost(head->right);
+    } else {
+        // 无右子树
+        TreeNode *parent = head->parent;
+        // 当前节点不是其父亲节点的左孩子
+        while (parent != nullptr && head != parent->left) {
+            head = head->parent;
+            parent = head->parent;
+        }
+        return parent;
+    }
+}
+```
+
+#### 5）题5-二叉树的序列化和反序列化
+
+二叉树的序列化和反序列化就是内存里的一棵树如何变成字符串形式，又如何从字符串形式变成内存里的树。
+
+如何判断一棵二叉树是不是另一棵二叉树的子树。
+
+```C++
+// 二叉树先序方式序列化
+std::string SerialByPre(TreeNode *head) {
+    if (head == nullptr) {
+        return "#_";
+    }
+    std::string res = std::to_string(head->val) + "_";
+    res += SerialByPre(head->left);
+    res += SerialByPre(head->right);
+    return res;
+}
+
+TreeNode *ReconPreOrder(std::queue<std::string> &q) {
+    std::string s = q.front();
+    q.pop();
+    if (s == "#") {
+        return nullptr;
+    }
+    TreeNode *head = new TreeNode;
+    head->val = std::stoi(s);
+    head->left = ReconPreOrder(q);
+    head->right = ReconPreOrder(q);
+    return head;
+}
+
+// 二叉树先序方式反序列化
+TreeNode *DeSerialByPre(const std::string &str) {
+    if (str.empty()) {
+        return nullptr;
+    }
+    std::queue<std::string> q;
+    std::string pattern = "_";
+    // 基于pattern字符串分割
+    for (int i = 0; i < str.size(); ++i) {
+        auto pos = str.find(pattern, i);
+        if (pos < str.size()) {
+            std::string s = str.substr(i, pos - i);
+            q.push(s);
+            i = pos + pattern.size() - 1;
+        }
+    }
+    return ReconPreOrder(q);
+}
+```
+
+#### 6）题6-折纸
+
+构成一个满二叉树，每个左子树头节点都是凹折痕，每个右子树头节点都是凸折痕。
+
+对折N次，打印折痕结果即为二叉树中序遍历结果。
+
+（对折1次：凹；对折2次：凹凹凸；对折3次：凹凹凸凹凹凸凸）
 
 ### 3、二叉树的相关概念及其实现判断
 

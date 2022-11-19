@@ -8,6 +8,7 @@ struct TreeNode {
     int val;
     TreeNode *left;
     TreeNode *right;
+    TreeNode *parent;
 };
 
 // 递归序

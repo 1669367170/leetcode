@@ -96,3 +96,75 @@ TreeNode *GetLowestAncestor(TreeNode *head, TreeNode *node1, TreeNode *node2) {
     }
     return left != nullptr ? left : right;
 }
+
+TreeNode *GetLeftMost(TreeNode *head) {
+    if (head == nullptr) {
+        return nullptr;
+    }
+    while (head->left) {
+        head = head->left;
+    }
+    return head;
+}
+
+// 获取二叉树节点的后继节点
+TreeNode *GetSuccessorNode(TreeNode *head) {
+    if (head == nullptr) {
+        return nullptr;
+    }
+    if (head->right != nullptr) {
+        return GetLeftMost(head->right);
+    } else {
+        // 无右子树
+        TreeNode *parent = head->parent;
+        // 当前节点不是其父亲节点的左孩子
+        while (parent != nullptr && head != parent->left) {
+            head = head->parent;
+            parent = head->parent;
+        }
+        return parent;
+    }
+}
+
+// 二叉树先序方式序列化
+std::string SerialByPre(TreeNode *head) {
+    if (head == nullptr) {
+        return "#_";
+    }
+    std::string res = std::to_string(head->val) + "_";
+    res += SerialByPre(head->left);
+    res += SerialByPre(head->right);
+    return res;
+}
+
+TreeNode *ReconPreOrder(std::queue<std::string> &q) {
+    std::string s = q.front();
+    q.pop();
+    if (s == "#") {
+        return nullptr;
+    }
+    TreeNode *head = new TreeNode;
+    head->val = std::stoi(s);
+    head->left = ReconPreOrder(q);
+    head->right = ReconPreOrder(q);
+    return head;
+}
+
+// 二叉树先序方式反序列化
+TreeNode *DeSerialByPre(const std::string &str) {
+    if (str.empty()) {
+        return nullptr;
+    }
+    std::queue<std::string> q;
+    std::string pattern = "_";
+    // 基于pattern字符串分割
+    for (int i = 0; i < str.size(); ++i) {
+        auto pos = str.find(pattern, i);
+        if (pos < str.size()) {
+            std::string s = str.substr(i, pos - i);
+            q.push(s);
+            i = pos + pattern.size() - 1;
+        }
+    }
+    return ReconPreOrder(q);
+}
